@@ -12,13 +12,15 @@ const app = express();
 const cors = require('cors');
 const morgan = require('morgan');
 
+const globalErrorHandler = require('./controllers/errorController.js');
+
 //import routes
-const userController = require('./controllers/userController.js');
+//const userController = require('./controllers/userController.js');
 const eventRoutes = require('./routes/eventRoutes.js');
-const authController = require('./controllers/authController.js');
+//const authController = require('./controllers/authController.js');
 
 //Global middlewares
-//Security Http headers
+//Set Security Http headers
 app.use(helmet());
 
 //Config dotenv
@@ -51,7 +53,7 @@ const limiter = rateLimit({
 app.use('/api', limiter);
 
 //Config app
-//Body parser, reading data from body into req.body
+//Body parser, reading data from body into req.body and setting cors
 app.use(cors());
 app.use(express.json({ limit: '10kb'}));
 
@@ -70,16 +72,16 @@ app.use(
 
 
 //Routes config
+app.use('/api/v1/', eventRoutes);
 //app.use('/api/v1/users', userController);
-app.use('/api/v1', eventRoutes);
 //app.use('/api/v1/auth', authController);
 
-//app.all('*', (req, res, next) =>{
-    //errorhandler
-//});
+app.all('*', (req, res, next) =>{
+    next(new AppError(`Can't find ${req.originalUrl} on this server`,400));
+});
 
 //Route for handling Errors
-//app.use(globalErrorHandler);
+app.use(globalErrorHandler);
 
 
 module.exports = app;

@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 
 
 //import models
-const eventModel= require('../models') 
+const eventModel= require('../models/eventModel');
 
 exports.getEvents = async()=>{
 

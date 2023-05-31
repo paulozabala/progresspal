@@ -11,7 +11,14 @@ const eventSchema = new schema({
     achieved:String,
     responsible:String,
     verifiedAt:Array,
-    createdAt:new Date().getDate,
+    createdAt:Date,
 });
 
-module.exports = mongoose.Model('event', eventSchema);
+eventSchema.pre('save', function (next) {
+    if (!this.createdAt) {
+        this.createdAt = new Date();
+    }
+    next();
+});
+
+module.exports = mongoose.model('event', eventSchema);
