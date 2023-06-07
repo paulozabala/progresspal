@@ -4,14 +4,14 @@ const schema = mongoose.Schema;
 
 const eventSchema = new schema({
     name: String,
-    Description:String,
-    place:String,
-    img:String,
-    goal:String,
-    achieved:String,
-    responsible:String,
-    verifiedAt:Array,
-    createdAt:Date,
+    Description: String,
+    place: String,
+    img: String,
+    goal: String,
+    achieved: String,
+    responsible: String,
+    verifiedAt: [String],
+    createdAt: Date,
 });
 
 eventSchema.pre('save', function (next) {

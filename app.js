@@ -13,6 +13,7 @@ const cors = require('cors');
 const morgan = require('morgan');
 
 const globalErrorHandler = require('./controllers/errorController.js');
+const AppError = require('./utils/appError');
 
 //import routes
 //const userController = require('./controllers/userController.js');
@@ -48,7 +49,7 @@ const limiter = rateLimit({
     max: 100,
     windowsMs: 60 * 60 * 1000,
     message: 'Too many request from this IP, please try again in an hour.',
-})
+});
 
 app.use('/api', limiter);
 
@@ -71,14 +72,22 @@ app.use(
 );
 
 
+
+
 //Routes config
-app.use('/api/v1/', eventRoutes);
-//app.use('/api/v1/users', userController);
-//app.use('/api/v1/auth', authController);
+app.use('/api/v1', eventRoutes);
+// Añadir prefijos a rutas / Cargar rutas
+app.use('/', (req, res, next) => {
+    res.status(200).json({
+        message: 'Welcome to the API'
+    });
+});
 
 app.all('*', (req, res, next) =>{
-    next(new AppError(`Can't find ${req.originalUrl} on this server`,400));
+  next(new AppError(`Can't find ${req.originalUrl} on this server`,400));
 });
+//app.use('/api/v1/users', userController);
+//app.use('/api/v1/auth', authController);
 
 //Route for handling Errors
 app.use(globalErrorHandler);

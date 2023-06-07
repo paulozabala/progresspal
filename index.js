@@ -9,7 +9,7 @@ process.on('uncaughtException', err =>{
 
 
 const server = app.listen(app.get('port'), ()=>{
-    console.log("conected to port", app.get('port'));
+    console.log("conected to port " + app.get('port'));
 });
 
 process.on('unhandledException', err =>{
