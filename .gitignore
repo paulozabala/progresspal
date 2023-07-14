@@ -2,3 +2,6 @@ node_modules
 .env
 .space
 Spacefile
+swaggercp.json
+swagger.json
+swaggery.json

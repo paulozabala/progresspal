@@ -1,19 +1,25 @@
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 
+//Import packages for app configuration
 const express = require('express');
+const app = express();
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
 
-const app = express();
 const cors = require('cors');
 const morgan = require('morgan');
 
+//Import Error handlers
 const globalErrorHandler = require('./controllers/errorController.js');
 const AppError = require('./utils/appError');
+
+//Import swagger documentation library
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('./swagger.json');
 
 //import routes
 //const userController = require('./controllers/userController.js');
@@ -22,7 +28,15 @@ const eventRoutes = require('./routes/eventRoutes.js');
 
 //Global middlewares
 //Set Security Http headers
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      connectSrc: ["'self'", 'https://progresspal-1-a5716280.deta.app/', '']
+      //connectSrc: ["'self'", 'http://127.0.0.1:8000', 'ws://localhost:42877/']
+    }
+  }
+}));
 
 //Config dotenv
 dotenv.config();
@@ -33,7 +47,7 @@ app.set('port', process.env.PORT || 9000);
 
 //middlewares
 if(process.env.NODE_ENV = 'development'){
-    app.use(morgan('tiny'));
+    app.use(morgan('dev'));
 }
 
 //set conn with DB parameters
@@ -72,22 +86,24 @@ app.use(
 );
 
 
-
-
 //Routes config
 app.use('/api/v1', eventRoutes);
+
+//Swagger route config
+app.use('/api/v1/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
 // Añadir prefijos a rutas / Cargar rutas
-app.use('/', (req, res, next) => {
+app.use('/', (req,res) => {
     res.status(200).json({
         message: 'Welcome to the API'
     });
+    next();
 });
+
 
 app.all('*', (req, res, next) =>{
   next(new AppError(`Can't find ${req.originalUrl} on this server`,400));
 });
-//app.use('/api/v1/users', userController);
-//app.use('/api/v1/auth', authController);
 
 //Route for handling Errors
 app.use(globalErrorHandler);
